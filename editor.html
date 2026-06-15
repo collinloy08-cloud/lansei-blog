@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>博客内容管理</title>
+    <link rel="stylesheet" href="editor.css" />
+  </head>
+  <body>
+    <header class="editor-header">
+      <div>
+        <p class="eyebrow">Blog Editor</p>
+        <h1>岚生的个人博客管理器</h1>
+        <p>用表单修改站点、分类、文章和链接，不需要打开代码。</p>
+      </div>
+      <div class="header-actions">
+        <label class="language-switch">
+          编辑语言
+          <select data-edit-lang>
+            <option value="zh">中文</option>
+            <option value="en">English</option>
+          </select>
+        </label>
+        <label class="sync-switch">
+          <input type="checkbox" data-auto-sync-en checked />
+          中文自动同步英文
+        </label>
+        <button class="button quiet" type="button" data-sync-current>同步当前内容到英文</button>
+        <a class="button quiet" href="index.html">查看博客</a>
+        <button class="button" type="button" data-save-direct>保存 content.js</button>
+      </div>
+    </header>
+
+    <section class="sync-status" data-sync-status>
+      自动同步会在你编辑中文内容后更新对应英文内容。
+    </section>
+
+    <main class="editor-shell">
+      <nav class="tabs" aria-label="管理页签">
+        <button class="active" type="button" data-tab="site">站点</button>
+        <button type="button" data-tab="author">作者与链接</button>
+        <button type="button" data-tab="categories">分类</button>
+        <button type="button" data-tab="posts">文章</button>
+        <button type="button" data-tab="export">导入导出</button>
+      </nav>
+
+      <section class="panel active" data-panel="site">
+        <div class="panel-head">
+          <h2>站点设置</h2>
+          <p>这些会出现在页面标题、首页介绍和页脚。</p>
+        </div>
+        <div class="form-grid">
+          <label>博客名称<input data-field="site.name" /></label>
+          <label>浏览器标题<input data-field="site.title" /></label>
+          <label>站点缩写<input data-field="site.initials" /></label>
+          <label>副标题<input data-field="site.subtitle" /></label>
+          <label class="full">描述<textarea data-field="site.description" rows="3"></textarea></label>
+          <label class="full">首页大标题<input data-field="site.homeTitle" /></label>
+          <label class="full">首页介绍<textarea data-field="site.homeDescription" rows="4"></textarea></label>
+          <label class="full">首页小标语<input data-field="site.homeSlogan" /></label>
+          <label>首页文章数<input data-field="site.latestCount" type="number" min="1" max="20" /></label>
+          <label>默认主题
+            <select data-field="site.defaultTheme">
+              <option value="light">light</option>
+              <option value="dark">dark</option>
+            </select>
+          </label>
+          <label class="full">页脚<input data-field="footer" /></label>
+        </div>
+      </section>
+
+      <section class="panel" data-panel="author">
+        <div class="panel-head">
+          <h2>作者与链接</h2>
+          <p>修改侧边栏作者介绍、近期状态和外部链接。</p>
+        </div>
+        <div class="form-grid">
+          <label>作者名<input data-field="author.name" /></label>
+          <label>位置<input data-field="author.location" /></label>
+          <label class="full">作者介绍<textarea data-field="author.bio" rows="4"></textarea></label>
+        </div>
+        <div class="list-editor">
+          <div class="list-title">
+            <h3>站点概览</h3>
+            <button class="button small" type="button" data-add-now>新增</button>
+          </div>
+          <div data-now-editor></div>
+        </div>
+        <div class="list-editor">
+          <div class="list-title">
+            <h3>外部链接</h3>
+            <button class="button small" type="button" data-add-social>新增</button>
+          </div>
+          <div data-social-editor></div>
+        </div>
+      </section>
+
+      <section class="panel" data-panel="categories">
+        <div class="panel-head">
+          <h2>分类</h2>
+          <p>文章的分类 ID 要和这里保持一致，例如 <code>paper</code>、<code>essay</code>。</p>
+        </div>
+        <div class="list-title">
+          <h3>分类列表</h3>
+          <button class="button small" type="button" data-add-category>新增分类</button>
+        </div>
+        <div data-category-editor></div>
+      </section>
+
+      <section class="panel" data-panel="posts">
+        <div class="panel-head">
+          <h2>文章</h2>
+          <p>新增、删除、修改文章。正文支持 Markdown 标题、列表、引用和普通段落。</p>
+        </div>
+        <div class="post-editor-layout">
+          <aside class="post-list">
+            <button class="button full" type="button" data-new-post>新增文章</button>
+            <div data-post-list></div>
+          </aside>
+          <section class="post-form" data-post-form>
+            <div class="form-grid">
+              <label class="full">标题<input data-post-field="title" /></label>
+              <label>Slug<input data-post-field="slug" /></label>
+              <label>日期<input data-post-field="date" placeholder="2026.06.14" /></label>
+              <label>分类<select data-post-field="category"></select></label>
+              <label>状态
+                <select data-post-field="status">
+                  <option value="published">published</option>
+                  <option value="draft">draft</option>
+                </select>
+              </label>
+              <label class="check-row"><input data-post-field="featured" type="checkbox" /> 精选文章</label>
+              <label class="full">摘要<textarea data-post-field="excerpt" rows="3"></textarea></label>
+              <label class="full">标签，逗号分隔<input data-post-field="tags" /></label>
+              <label class="full">正文<textarea class="body-editor" data-post-field="body" rows="18"></textarea></label>
+            </div>
+            <div class="post-actions">
+              <button class="button" type="button" data-duplicate-post>复制此文</button>
+              <button class="button danger" type="button" data-delete-post>删除此文</button>
+            </div>
+            <div class="preview-card">
+              <h3>预览</h3>
+              <article data-preview></article>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section class="panel" data-panel="export">
+        <div class="panel-head">
+          <h2>导入导出</h2>
+          <p>推荐用“保存 content.js”。如果浏览器不支持直接保存，就下载文件后替换原文件。</p>
+        </div>
+        <div class="export-actions">
+          <button class="button" type="button" data-save-direct>保存 content.js</button>
+          <button class="button quiet" type="button" data-download>下载 content.js</button>
+          <button class="button quiet" type="button" data-copy>复制文件内容</button>
+          <label class="button quiet file-button">导入 content.js<input type="file" accept=".js,.json" data-import hidden /></label>
+          <button class="button danger" type="button" data-reset-draft>清除浏览器草稿</button>
+        </div>
+        <textarea class="export-box" data-export rows="16" spellcheck="false"></textarea>
+      </section>
+    </main>
+
+    <div class="toast" data-toast role="status" aria-live="polite"></div>
+
+    <script src="content.js"></script>
+    <script src="editor.js"></script>
+  </body>
+</html>

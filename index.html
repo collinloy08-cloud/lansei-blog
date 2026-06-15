@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>岚生的个人博客</title>
+    <meta name="description" content="科研收获、论文理解、散文纪事与长期写作。" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="progress" aria-hidden="true"></div>
+    <div class="reading-meter" data-reading-meter>0%</div>
+    <button class="back-top" type="button" data-back-top aria-label="回到顶部">↑</button>
+    <button class="toc-fab" type="button" data-drawer-toggle hidden>目录</button>
+
+    <div class="ambient" aria-hidden="true"></div>
+
+    <aside class="article-drawer" data-article-drawer hidden aria-label="文章导航">
+      <div class="drawer-tabs" role="tablist">
+        <button class="active" type="button" data-drawer-tab="toc" data-i18n="articleToc">文章目录</button>
+        <button type="button" data-drawer-tab="overview" data-i18n="siteOverview">站点概览</button>
+      </div>
+      <div class="drawer-panel active" data-drawer-panel="toc">
+        <nav class="drawer-toc" data-drawer-toc></nav>
+      </div>
+      <div class="drawer-panel" data-drawer-panel="overview">
+        <div class="drawer-overview" data-drawer-overview></div>
+      </div>
+      <button class="drawer-close" type="button" data-drawer-close aria-label="关闭文章目录">×</button>
+    </aside>
+
+    <div class="site-shell">
+      <header class="site-header" id="top">
+        <div class="site-title-block">
+          <a class="site-title" href="#/" data-site-title>岚生的个人博客</a>
+          <p data-site-subtitle>Research notes, essays, and field diary.</p>
+        </div>
+
+        <nav class="site-nav" aria-label="主要导航">
+          <a href="#/" data-i18n="navHome">首页</a>
+          <a href="#/posts" data-i18n="navPosts">文章</a>
+          <a href="#/archives" data-i18n="navArchives">归档</a>
+          <a href="#/categories" data-i18n="navCategories">分类</a>
+          <a href="#/tags" data-i18n="navTags">标签</a>
+          <a href="#/about" data-i18n="navAbout">关于</a>
+          <a href="editor.html" data-i18n="navManage">管理</a>
+        </nav>
+
+        <div class="header-actions">
+          <button class="pill-button" type="button" data-lang-toggle>EN</button>
+          <button class="theme-button" type="button" data-theme-toggle aria-label="切换明暗模式">
+            <span data-theme-icon aria-hidden="true">◐</span>
+          </button>
+        </div>
+      </header>
+
+      <div class="page-grid">
+        <main class="content">
+          <section class="home-hero reveal" data-home-hero>
+            <p class="page-label">Home</p>
+            <h1 data-home-title></h1>
+            <p class="home-description" data-home-description></p>
+            <div class="home-summary">
+              <span><span data-i18n="totalPrefix">共</span> <strong data-post-count>0</strong> <span data-i18n="totalSuffix">篇文章</span></span>
+              <span data-home-slogan></span>
+            </div>
+          </section>
+
+          <section class="search-row reveal" aria-label="文章搜索">
+            <label class="search-field">
+              <span aria-hidden="true">⌕</span>
+              <input data-search type="search" placeholder="搜索论文、概念、散文、标签" />
+            </label>
+          </section>
+
+          <section class="view-root" data-view aria-live="polite"></section>
+        </main>
+
+        <aside class="sidebar" aria-label="站点信息">
+          <section class="sidebar-block author-block reveal" id="about">
+            <img class="author-cover" src="assets/hero-studio.png" alt="" />
+            <div class="avatar" data-site-initials>岚</div>
+            <h2 data-author-name>岚生</h2>
+            <p data-author-bio></p>
+          </section>
+
+          <section class="sidebar-block stat-block reveal" aria-label="站点统计">
+            <a href="#/archives">
+              <strong data-stat-posts>0</strong>
+              <span data-i18n="statPosts">文章</span>
+            </a>
+            <a href="#/categories">
+              <strong data-stat-categories>0</strong>
+              <span data-i18n="statCategories">分类</span>
+            </a>
+            <a href="#/tags">
+              <strong data-stat-tags>0</strong>
+              <span data-i18n="statTags">标签</span>
+            </a>
+          </section>
+
+          <section class="sidebar-block article-toc-block reveal" data-toc-block hidden>
+            <h2 data-i18n="articleToc">文章目录</h2>
+            <nav class="toc-list" data-article-toc></nav>
+          </section>
+
+          <section class="sidebar-block reveal">
+            <h2 data-i18n="recentUpdates">最近更新</h2>
+            <nav class="side-list" data-recent-links></nav>
+          </section>
+
+          <section class="sidebar-block reveal">
+            <h2 data-i18n="categories">分类</h2>
+            <nav class="side-list" data-category-links></nav>
+          </section>
+
+          <section class="sidebar-block reveal">
+            <h2 data-i18n="siteOverview">站点概览</h2>
+            <ul class="now-list" data-now-list></ul>
+          </section>
+
+          <section class="sidebar-block reveal">
+            <h2 data-i18n="links">链接</h2>
+            <div class="side-list" data-socials></div>
+          </section>
+        </aside>
+      </div>
+
+      <footer class="site-footer">
+        <span data-footer>© 2026 岚生的个人博客</span>
+        <a href="#top" data-i18n="backTop">回到顶部</a>
+      </footer>
+    </div>
+
+    <script src="content.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
