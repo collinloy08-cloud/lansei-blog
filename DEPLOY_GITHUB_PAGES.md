@@ -2,7 +2,7 @@
 
 ## 1. 上传博客文件
 
-在 GitHub 新建一个仓库，比如 `lansei-blog`。把当前目录里的所有文件上传到仓库根目录，确保 `index.html`、`content.js`、`styles.css`、`editor.html`、`CNAME` 都在仓库根目录。
+在 GitHub 新建一个仓库，比如 `lansei-blog`。把博客前台文件上传到仓库根目录，确保 `index.html`、`content.js`、`styles.css`、`script.js`、`CNAME` 都在仓库根目录。`editor.html`、`editor.js`、`editor.css` 只能本地使用，不要发布到 GitHub Pages。
 
 ## 2. 开启 GitHub Pages
 

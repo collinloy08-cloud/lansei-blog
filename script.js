@@ -8,7 +8,6 @@ const I18N = {
     navCategories: "分类",
     navTags: "标签",
     navAbout: "关于",
-    navManage: "管理",
     totalPrefix: "共",
     totalSuffix: "篇文章",
     statPosts: "文章",
@@ -43,7 +42,6 @@ const I18N = {
     navCategories: "Categories",
     navTags: "Tags",
     navAbout: "About",
-    navManage: "Manage",
     totalPrefix: "",
     totalSuffix: "posts",
     statPosts: "Posts",
@@ -581,7 +579,6 @@ function renderPost(slug) {
       </div>
       <footer class="article-footer">
         <a href="#/posts">${t("navPosts")}</a>
-        <a href="editor.html">${t("navManage")}</a>
       </footer>
     </article>
     ${

@@ -1,0 +1,4 @@
+# Local-only content editor. Do not publish these files to GitHub Pages.
+editor.html
+editor.css
+editor.js
