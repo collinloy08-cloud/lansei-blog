@@ -34,7 +34,7 @@ window.BLOG_CONTENT = {
       "zh": "科研笔记 / 论文精读 / 胡言乱语",
       "en": "Scientific research notes / intensive reading of thesis / gibberish"
     },
-    "latestCount": 3
+    "latestCount": 1
   },
   "author": {
     "name": {
