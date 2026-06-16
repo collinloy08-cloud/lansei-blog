@@ -114,8 +114,8 @@ window.BLOG_CONTENT = {
       "category": "essay",
       "date": "2026.06.15",
       "excerpt": {
-        "zh": "这篇博客就算是我真正意义上的第一篇博客了，我会主要回答几个问题：我为什么要写博客？为什么是博客？我想要拿它达到什么目的？",
-        "en": "Even if this blog is my first blog in the true sense, I will mainly answer a few questions: Why should I write a blog? Why blog? What is my purpose for taking it?"
+        "zh": "这篇博客就是我真正意义上的第一篇博客了，我会主要回答几个问题：我为什么要写博客？为什么是博客？我想要拿它达到什么目的？",
+        "en": "This blog is my first blog in the true sense, and I will mainly answer a few questions: Why should I write a blog? Why blog? What is my purpose for taking it?"
       },
       "tags": [
         "新文章",
