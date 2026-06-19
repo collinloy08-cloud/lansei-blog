@@ -1,6 +1,8 @@
 name = "lansei-blog-analytics"
 main = "src/index.js"
 compatibility_date = "2026-06-01"
+workers_dev = true
+preview_urls = false
 routes = [
   { pattern = "analytics.lansei.top", custom_domain = true },
   { pattern = "lansei.top/collect", zone_name = "lansei.top" }

@@ -33,7 +33,7 @@
 
 5. 在 Worker 设置中添加 Custom Domain `analytics.lansei.top`。部署完成后访问：
 
-   - 采集入口：`https://lansei.top/collect`
+   - 采集入口：`https://lansei-blog-analytics.collinloy08.workers.dev/collect`
    - 健康检查：`https://analytics.lansei.top/health`
    - 私有统计页：`https://analytics.lansei.top/admin`
 

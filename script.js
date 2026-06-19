@@ -1,5 +1,6 @@
 const content = window.BLOG_CONTENT;
-const ANALYTICS_ENDPOINT = content.site.analyticsEndpoint || "/collect";
+const ANALYTICS_ENDPOINT =
+  content.site.analyticsEndpoint || "https://lansei-blog-analytics.collinloy08.workers.dev/collect";
 
 let lastTrackedRoute = null;
 
