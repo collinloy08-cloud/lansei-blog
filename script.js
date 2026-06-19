@@ -1,4 +1,51 @@
 const content = window.BLOG_CONTENT;
+const ANALYTICS_ENDPOINT = content.site.analyticsEndpoint || "/collect";
+
+let lastTrackedRoute = null;
+
+function getAnalyticsSessionId() {
+  try {
+    const stored = sessionStorage.getItem("blog-analytics-session");
+    if (stored) return stored;
+    const next = crypto.randomUUID();
+    sessionStorage.setItem("blog-analytics-session", next);
+    return next;
+  } catch {
+    return "";
+  }
+}
+
+function trackCurrentVisit() {
+  if (!ANALYTICS_ENDPOINT || navigator.globalPrivacyControl || navigator.doNotTrack === "1") return;
+
+  const routeKey = `${window.location.pathname}${window.location.hash || "#/"}`;
+  if (routeKey === lastTrackedRoute) return;
+  lastTrackedRoute = routeKey;
+
+  const hash = (window.location.hash || "#/").replace(/^#\/?/, "");
+  const [route = "home", ...parts] = hash.split("/");
+  const value = decodeURIComponent(parts.join("/"));
+  const post = route === "post" ? sortedPosts().find((item) => item.slug === value) : null;
+  const payload = {
+    path: routeKey,
+    route: route || "home",
+    articleSlug: post?.slug || "",
+    articleTitle: post ? local(post.title) : "",
+    language: state.lang,
+    referrer: document.referrer,
+    sessionId: getAnalyticsSessionId(),
+  };
+
+  fetch(ANALYTICS_ENDPOINT, {
+    method: "POST",
+    mode: "cors",
+    keepalive: true,
+    headers: { "Content-Type": "text/plain;charset=UTF-8" },
+    body: JSON.stringify(payload),
+  }).catch(() => {
+    // Analytics must never interrupt reading.
+  });
+}
 
 const I18N = {
   zh: {
@@ -26,6 +73,8 @@ const I18N = {
     categoriesTitle: "分类",
     tagsTitle: "标签",
     aboutTitle: "关于岚生",
+    privacyTitle: "访问统计与隐私",
+    privacyBody: "本站使用自托管访问统计，记录访问时间、IP 地址和浏览内容，并长期保存，仅供站长查看，不用于广告或向第三方出售。浏览器启用 Global Privacy Control 或 Do Not Track 时不会采集。",
     readMore: "阅读全文",
     related: "相关文章",
     noPosts: "没有找到匹配的文章。",
@@ -60,6 +109,8 @@ const I18N = {
     categoriesTitle: "Categories",
     tagsTitle: "Tags",
     aboutTitle: "About Lansheng",
+    privacyTitle: "Analytics and privacy",
+    privacyBody: "This site uses self-hosted analytics to record visit time, IP address, and viewed content. Records are retained and are visible only to the site owner; they are not used for advertising or sold to third parties. Tracking is disabled when Global Privacy Control or Do Not Track is enabled.",
     readMore: "Read more",
     related: "Related",
     noPosts: "No matching posts found.",
@@ -438,6 +489,8 @@ function renderAbout() {
       </div>
       <p>${escapeHtml(local(content.author.bio))}</p>
       <p>${escapeHtml(t("aboutBody"))}</p>
+      <h2>${escapeHtml(t("privacyTitle"))}</h2>
+      <p>${escapeHtml(t("privacyBody"))}</p>
     </section>
   `;
   observeReveals();
@@ -614,6 +667,7 @@ function renderRoute() {
   else renderHome();
 
   updateProgress();
+  trackCurrentVisit();
 }
 
 function renderSidebar() {

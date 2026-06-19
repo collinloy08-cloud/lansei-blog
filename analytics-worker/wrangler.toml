@@ -1,0 +1,19 @@
+name = "lansei-blog-analytics"
+main = "src/index.js"
+compatibility_date = "2026-06-01"
+routes = [
+  { pattern = "analytics.lansei.top", custom_domain = true },
+  { pattern = "lansei.top/collect", zone_name = "lansei.top" }
+]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "lansei-blog-analytics"
+database_id = "e26d99f5-ada7-469d-91eb-0639ad3414ed"
+
+[vars]
+ACCESS_TEAM_DOMAIN = "REPLACE_WITH_YOUR_TEAM.cloudflareaccess.com"
+ACCESS_AUD = "REPLACE_WITH_ACCESS_APPLICATION_AUD"
+
+[observability]
+enabled = true
