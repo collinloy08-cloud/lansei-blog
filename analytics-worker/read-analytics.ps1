@@ -1,4 +1,7 @@
 $ErrorActionPreference = "Stop"
+[Console]::InputEncoding = New-Object System.Text.UTF8Encoding($false)
+[Console]::OutputEncoding = New-Object System.Text.UTF8Encoding($false)
+$OutputEncoding = [Console]::OutputEncoding
 
 $root = Split-Path -Parent $MyInvocation.MyCommand.Path
 $npx = "C:\Program Files\nodejs\npx.cmd"
@@ -17,12 +20,11 @@ function Invoke-AnalyticsQuery([string]$QueryFile) {
   return @($payload[0].results)
 }
 
-$totals = @(Invoke-AnalyticsQuery "queries\totals.sql")
-$pages = @(Invoke-AnalyticsQuery "queries\pages.sql")
-$recent = @(Invoke-AnalyticsQuery "queries\recent.sql")
+$dashboard = @(Invoke-AnalyticsQuery "queries\dashboard.sql")
+$row = if ($dashboard.Count) { $dashboard[0] } else { $null }
 
 [ordered]@{
-  totals = if ($totals.Count) { $totals[0] } else { @{} }
-  pages = $pages
-  recent = $recent
+  totals_json = if ($row) { $row.totals_json } else { '{}' }
+  pages_json = if ($row) { $row.pages_json } else { '[]' }
+  recent_json = if ($row) { $row.recent_json } else { '[]' }
 } | ConvertTo-Json -Depth 8 -Compress
