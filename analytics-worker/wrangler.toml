@@ -20,8 +20,8 @@ database_name = "lansei-blog-analytics"
 database_id = "e26d99f5-ada7-469d-91eb-0639ad3414ed"
 
 [vars]
-ACCESS_TEAM_DOMAIN = "REPLACE_WITH_YOUR_TEAM.cloudflareaccess.com"
-ACCESS_AUD = "REPLACE_WITH_ACCESS_APPLICATION_AUD"
+ACCESS_TEAM_DOMAIN = "young-sunset-1bcf.cloudflareaccess.com"
+ACCESS_AUD = "a5ffb9324fd39eb53c2fbd98bee233bf0d6f35a534183f44048ae320cc6d5fa3"
 GITHUB_REPOSITORY = "collinloy08-cloud/lansei-blog"
 GITHUB_BRANCH = "main"
 GITHUB_CONTENT_PATH = "content.js"
