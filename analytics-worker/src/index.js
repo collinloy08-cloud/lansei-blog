@@ -7,6 +7,7 @@ const BLOG_ORIGINS = new Set([
 
 const MAX_PAYLOAD_BYTES = 4096;
 const MAX_FIELD_LENGTH = 1024;
+const MAX_CONTENT_BYTES = 2 * 1024 * 1024;
 let cachedJwks = null;
 let cachedJwksAt = 0;
 
@@ -26,7 +27,7 @@ export default {
       return json({ ok: true });
     }
 
-    if (url.pathname === "/admin" || url.pathname.startsWith("/api/")) {
+    if (isAdminRequest(url.pathname)) {
       const identity = await verifyAdmin(request, env);
       if (!identity.ok) {
         return new Response(identity.message, {
@@ -35,15 +36,160 @@ export default {
         });
       }
 
-      if (url.pathname === "/admin") return adminPage(identity.email);
-      if (url.pathname === "/api/summary") return summary(env);
-      if (url.pathname === "/api/export.csv") return exportCsv(env);
+      if (url.pathname === "/admin") return Response.redirect(`${url.origin}/?tab=analytics`, 302);
+      if (url.pathname === "/api/content.js" && request.method === "GET") return githubContentScript(env);
+      if (url.pathname === "/api/publish" && request.method === "POST") return publishGitHubContent(request, env);
+      if (url.pathname === "/api/summary" && request.method === "GET") return summary(env);
+      if (url.pathname === "/api/export.csv" && request.method === "GET") return exportCsv(env);
+      if (!url.pathname.startsWith("/api/")) return privateAsset(request, env);
+      return json({ ok: false, message: "Not found" }, 404);
     }
 
     return new Response("Not found", { status: 404 });
   },
 
 };
+
+function isAdminRequest(pathname) {
+  return (
+    pathname === "/" ||
+    pathname === "/index.html" ||
+    pathname === "/editor.css" ||
+    pathname === "/editor.js" ||
+    pathname === "/admin" ||
+    pathname.startsWith("/api/")
+  );
+}
+
+async function privateAsset(request, env) {
+  if (!env.ASSETS) return new Response("Admin assets are not configured.", { status: 503 });
+  const url = new URL(request.url);
+  const isShell = url.pathname === "/" || url.pathname === "/index.html";
+  if (isShell) url.pathname = "/admin.txt";
+  const response = await env.ASSETS.fetch(new Request(url, request));
+  const headers = new Headers(response.headers);
+  if (isShell) headers.set("content-type", "text/html;charset=UTF-8");
+  headers.set("cache-control", "no-store");
+  headers.set("x-content-type-options", "nosniff");
+  headers.set("x-frame-options", "DENY");
+  headers.set("x-robots-tag", "noindex, nofollow");
+  headers.set(
+    "content-security-policy",
+    "default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self' https://translate.googleapis.com; img-src 'self' data:; frame-ancestors 'none'; base-uri 'none'; form-action 'none'; object-src 'none'"
+  );
+  return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
+}
+
+function githubSettings(env) {
+  const repository = String(env.GITHUB_REPOSITORY || "collinloy08-cloud/lansei-blog").trim();
+  if (!/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(repository)) throw new Error("Invalid GitHub repository setting");
+  return {
+    repository,
+    branch: String(env.GITHUB_BRANCH || "main").trim(),
+    path: String(env.GITHUB_CONTENT_PATH || "content.js").trim(),
+  };
+}
+
+function githubHeaders(env) {
+  const headers = new Headers({
+    accept: "application/vnd.github+json",
+    "user-agent": "lansei-blog-admin",
+    "x-github-api-version": "2022-11-28",
+  });
+  if (env.GITHUB_TOKEN) headers.set("authorization", `Bearer ${env.GITHUB_TOKEN}`);
+  return headers;
+}
+
+async function getGitHubContent(env) {
+  const settings = githubSettings(env);
+  const endpoint = `https://api.github.com/repos/${settings.repository}/contents/${encodeURIComponent(settings.path)}?ref=${encodeURIComponent(settings.branch)}`;
+  const response = await fetch(endpoint, { headers: githubHeaders(env), cf: { cacheTtl: 0 } });
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok || !payload.content || !payload.sha) {
+    throw new Error(payload.message || "Unable to read content.js from GitHub");
+  }
+  const bytes = base64Bytes(String(payload.content).replace(/\s/g, ""));
+  return { content: new TextDecoder().decode(bytes), sha: payload.sha, settings };
+}
+
+async function githubContentScript(env) {
+  try {
+    const file = await getGitHubContent(env);
+    const normalized = normalizeContentScript(file.content);
+    return new Response(normalized, {
+      headers: {
+        "content-type": "text/javascript;charset=UTF-8",
+        "cache-control": "no-store",
+        "x-content-type-options": "nosniff",
+        "x-robots-tag": "noindex, nofollow",
+      },
+    });
+  } catch (error) {
+    return new Response(`window.BLOG_CONTENT_LOAD_ERROR = ${JSON.stringify(error.message)};`, {
+      status: 502,
+      headers: { "content-type": "text/javascript;charset=UTF-8", "cache-control": "no-store" },
+    });
+  }
+}
+
+async function publishGitHubContent(request, env) {
+  if (!env.GITHUB_TOKEN) {
+    return json({ ok: false, message: "尚未配置 GitHub 发布凭据。" }, 503);
+  }
+
+  const declaredLength = Number(request.headers.get("content-length") || 0);
+  if (declaredLength > MAX_CONTENT_BYTES) return json({ ok: false, message: "内容文件过大。" }, 413);
+
+  try {
+    const buffer = await request.arrayBuffer();
+    if (buffer.byteLength > MAX_CONTENT_BYTES) return json({ ok: false, message: "内容文件过大。" }, 413);
+    const content = normalizeContentScript(new TextDecoder().decode(buffer));
+    const current = await getGitHubContent(env);
+    const endpoint = `https://api.github.com/repos/${current.settings.repository}/contents/${encodeURIComponent(current.settings.path)}`;
+    const response = await fetch(endpoint, {
+      method: "PUT",
+      headers: new Headers({ ...Object.fromEntries(githubHeaders(env)), "content-type": "application/json" }),
+      body: JSON.stringify({
+        message: "Update blog content",
+        content: bytesToBase64(new TextEncoder().encode(content)),
+        sha: current.sha,
+        branch: current.settings.branch,
+      }),
+    });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(payload.message || "GitHub rejected the update");
+    return json({
+      ok: true,
+      message: "已发布到 GitHub，网站通常会在一两分钟内更新。",
+      commitUrl: payload.commit?.html_url || "",
+    });
+  } catch (error) {
+    return json({ ok: false, message: `发布失败：${error.message}` }, 502);
+  }
+}
+
+function normalizeContentScript(source) {
+  const match = String(source).trim().match(/^window\.BLOG_CONTENT\s*=\s*([\s\S]*);\s*$/);
+  if (!match) throw new Error("content.js format is invalid");
+  const content = JSON.parse(match[1]);
+  if (!content || typeof content !== "object" || !Array.isArray(content.posts) || !Array.isArray(content.categories)) {
+    throw new Error("Blog content is incomplete");
+  }
+  return `window.BLOG_CONTENT = ${JSON.stringify(content, null, 2)};\n`;
+}
+
+function base64Bytes(value) {
+  return Uint8Array.from(atob(value), (character) => character.charCodeAt(0));
+}
+
+function bytesToBase64(bytes) {
+  let binary = "";
+  const chunkSize = 0x8000;
+  for (let offset = 0; offset < bytes.length; offset += chunkSize) {
+    binary += String.fromCharCode(...bytes.subarray(offset, offset + chunkSize));
+  }
+  return btoa(binary);
+}
 
 async function collectVisit(request, env) {
   const origin = request.headers.get("origin") || "";
@@ -281,8 +427,9 @@ function corsResponse(request, body, status) {
   return new Response(body, { status, headers });
 }
 
-function json(value) {
+function json(value, status = 200) {
   return new Response(JSON.stringify(value), {
+    status,
     headers: { "content-type": "application/json;charset=UTF-8", "cache-control": "no-store", "x-robots-tag": "noindex" },
   });
 }

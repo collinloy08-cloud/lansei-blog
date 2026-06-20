@@ -1,13 +1,13 @@
 # Local-only content editor. Do not publish these files to GitHub Pages.
-editor.html
-editor.css
-editor.js
-local-editor-server.js
-open-blog-editor.ps1
-local-editor-icon.ico
-local-analytics.html
-local-analytics.css
-local-analytics.js
+/editor.html
+/editor.css
+/editor.js
+/local-editor-server.js
+/open-blog-editor.ps1
+/local-editor-icon.ico
+/local-analytics.html
+/local-analytics.css
+/local-analytics.js
 
 # Local analytics archives contain visitor IP addresses. Never publish them.
 analytics-worker/backups/

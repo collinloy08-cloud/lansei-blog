@@ -5,8 +5,14 @@ workers_dev = true
 preview_urls = false
 routes = [
   { pattern = "analytics.lansei.top", custom_domain = true },
+  { pattern = "admin.lansei.top", custom_domain = true },
   { pattern = "lansei.top/collect", zone_name = "lansei.top" }
 ]
+
+[assets]
+directory = "../.cloudflare/admin-assets"
+binding = "ASSETS"
+run_worker_first = true
 
 [[d1_databases]]
 binding = "DB"
@@ -16,6 +22,9 @@ database_id = "e26d99f5-ada7-469d-91eb-0639ad3414ed"
 [vars]
 ACCESS_TEAM_DOMAIN = "REPLACE_WITH_YOUR_TEAM.cloudflareaccess.com"
 ACCESS_AUD = "REPLACE_WITH_ACCESS_APPLICATION_AUD"
+GITHUB_REPOSITORY = "collinloy08-cloud/lansei-blog"
+GITHUB_BRANCH = "main"
+GITHUB_CONTENT_PATH = "content.js"
 
 [observability]
 enabled = true

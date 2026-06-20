@@ -1,6 +1,6 @@
 # 岚生博客访客统计
 
-这个目录包含独立的 Cloudflare Worker。博客只发送访问事件，Worker 从 Cloudflare 请求头取得真实访客 IP，并把数据写入 D1。`/admin` 和 `/api/*` 同时受 Cloudflare Access 与 Worker 内部 JWT 校验保护。
+这个目录包含博客的 Cloudflare Worker。博客只发送访问事件，Worker 从 Cloudflare 请求头取得真实访客 IP，并把数据写入 D1。`admin.lansei.top` 提供手机和电脑都能使用的私有管理后台，内容发布通过 GitHub API 完成。
 
 ## 部署
 
@@ -19,23 +19,23 @@
 
 3. 在 Cloudflare Zero Trust 中创建 Self-hosted Access application：
 
-   - Domain: `analytics.lansei.top`
-   - Path: `/admin*`
-   - 再为 `analytics.lansei.top/api/*` 创建同样的保护规则
+   - Domain: `admin.lansei.top`
+   - Path 留空，保护整个域名
    - Allow policy 只加入自己的邮箱
 
-4. 将 Access 的 Team domain 和 Application AUD 填入 `wrangler.toml`，并把管理员邮箱存为 Worker secret：
+4. 将 Access 的 Team domain 和 Application AUD 填入 `wrangler.toml`，并把管理员邮箱与 GitHub fine-grained token 存为 Worker secret。Token 只授权 `collinloy08-cloud/lansei-blog` 仓库的 Contents 读写权限：
 
    ```powershell
    npx wrangler secret put ADMIN_EMAIL
+   npx wrangler secret put GITHUB_TOKEN
    npx wrangler deploy
    ```
 
-5. 在 Worker 设置中添加 Custom Domain `analytics.lansei.top`。部署完成后访问：
+5. 部署完成后访问：
 
    - 采集入口：`https://lansei-blog-analytics.collinloy08.workers.dev/collect`
    - 健康检查：`https://analytics.lansei.top/health`
-   - 私有统计页：`https://analytics.lansei.top/admin`
+   - 私有管理后台：`https://admin.lansei.top`
 
 ## 本地永久备份
 
