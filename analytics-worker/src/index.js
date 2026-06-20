@@ -145,6 +145,10 @@ async function publishGitHubContent(request, env) {
     if (buffer.byteLength > MAX_CONTENT_BYTES) return json({ ok: false, message: "内容文件过大。" }, 413);
     const content = normalizeContentScript(new TextDecoder().decode(buffer));
     const current = await getGitHubContent(env);
+    const currentContent = normalizeContentScript(current.content);
+    if (content === currentContent) {
+      return json({ ok: true, published: false, message: "内容没有变化，GitHub 发布连接正常。" });
+    }
     const endpoint = `https://api.github.com/repos/${current.settings.repository}/contents/${encodeURIComponent(current.settings.path)}`;
     const response = await fetch(endpoint, {
       method: "PUT",
