@@ -106,6 +106,29 @@ window.BLOG_CONTENT = {
   ],
   "posts": [
     {
+      "slug": "new-post-1782910403052",
+      "title": {
+        "zh": "轰轰烈烈的期末大复习结束了",
+        "en": "The vigorous end-of-term review is over"
+      },
+      "category": "essay",
+      "date": "2026.07.01",
+      "excerpt": {
+        "zh": "在经历了整整十天的期末周后，身心俱疲，特写此文。",
+        "en": "After a full ten days at the end of the period, I was exhausted physically and mentally, and this article was close-up."
+      },
+      "tags": [
+        "期末周",
+        "发表感言"
+      ],
+      "featured": false,
+      "status": "draft",
+      "body": {
+        "zh": "## ",
+        "en": "##"
+      }
+    },
+    {
       "slug": "new-post-1781493102975",
       "title": {
         "zh": "第一篇博客~Hello World",
